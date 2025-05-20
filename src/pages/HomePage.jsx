@@ -1,6 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [nickname, setNickname] = useState("");
@@ -11,7 +15,7 @@ const HomePage = () => {
 
 
   const menuItems = [
-    { title: "학습하기", color: "bg-red-400" },
+    { title: "학습하기", color: "bg-red-400", link: "/learn" },
     { title: "낱말카드", color: "bg-orange-300" },
     { title: "단어퀴즈", color: "bg-yellow-300" },
     { title: "오답노트", color: "bg-teal-300" },
@@ -44,8 +48,11 @@ const HomePage = () => {
         {menuItems.map((item, index) => (
           <div
             key={index}
-            className={`w-48 h-52 ${item.color} rounded-xl shadow-md flex flex-col items-center justify-center`}
-          >
+            onClick={() => {
+              if (item.link !== "#") navigate(item.link);
+            }}
+            className={`w-48 h-52 ${item.color} rounded-xl shadow-md flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition`}
+        >
             <div className="text-lg font-bold">{item.title}</div>
             <div className="relative mt-4 w-24 h-14">
               <div className="absolute top-1 left-2 w-20 h-12 bg-white rounded-md shadow opacity-50" />
