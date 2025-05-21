@@ -19,9 +19,9 @@ const HomePage = ({
 
   const menuItems = [
     { title: "학습하기", color: "bg-red-400", link: "/learn" },
-    { title: "낱말카드", color: "bg-orange-300", link: "#" },
-    { title: "단어퀴즈", color: "bg-yellow-300", link: "#" },
-    { title: "오답노트", color: "bg-teal-300", link: "#" },
+    { title: "낱말카드", color: "bg-orange-300", link: "/cards" },
+    { title: "단어퀴즈", color: "bg-yellow-300", link: "/quiz" },
+    { title: "오답노트", color: "bg-teal-300", link: "/wrong" },
   ];
 
   const [password, setPassword] = useState("");
