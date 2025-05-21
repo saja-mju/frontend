@@ -1,6 +1,8 @@
+// src/pages/LearnPage.jsx
 import { useState } from "react";
+import Header from "../components/Header";
 
-const LearnPage = () => {
+const LearnPage = ({ isLoggedIn, setIsLoggedIn }) => {
   const data = [
     {
       hanja: "四字成語",
@@ -10,7 +12,6 @@ const LearnPage = () => {
   ];
 
   const [index, setIndex] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // ✅ 로그인 상태
   const current = data[index];
 
   const prev = () => {
@@ -23,25 +24,18 @@ const LearnPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] flex flex-col">
-      {/* ✅ 공통 헤더 */}
-      <header className="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
-        <div className="text-sm">학습하기 ▼</div>
-        <div
-          className="text-sm cursor-pointer"
-          onClick={() => setIsLoggedIn(!isLoggedIn)}
-        >
-          {isLoggedIn ? "로그아웃" : "로그인"}
-        </div>
-      </header>
+      {/* ✅ 헤더 추가 */}
+      <Header
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        setShowLoginModal={() => {}} // 모달 없음 (헤더는 클릭 시 로그아웃만 처리)
+      />
 
-      {/* ✅ 90~95% 너비의 둥근 흰색 박스 */}
       <div className="bg-white w-[95%] rounded-3xl shadow px-8 py-12 mx-auto my-6 flex flex-col items-center justify-center">
-        {/* 제목 */}
         <h1 className="text-left text-lg font-semibold w-full mb-6">
           학습하기
         </h1>
 
-        {/* 카드 + 버튼 */}
         <div className="flex items-center justify-center">
           <button
             onClick={prev}
