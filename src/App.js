@@ -1,10 +1,18 @@
 // src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import HomeWithDailyQuiz from "./pages/HomeWithDailyQuiz";
 import LearnPage from "./pages/LearnPage";
 import WordCardPage from "./pages/WordCardPage";
 import QuizPage from "./pages/QuizPage";
 import WrongNotePage from "./pages/WrongNotePage";
+import SynonymQuizPage from "./pages/SynonymQuizPage";
+import HanjaComboPage from "./pages/HanjaComboPage";
+import DailyQuizModal from "./components/DailyQuizModal";
+import CalendarModal from "./components/CalendarModal";
+import RankingPage from "./pages/RankingPage";
+
+
+
 import { useState } from "react";
 
 function App() {
@@ -19,23 +27,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              showLoginModal={showLoginModal}
-              setShowLoginModal={setShowLoginModal}
-              nickname={nickname}
-              setNickname={setNickname}
-              progress={progress}
-              setProgress={setProgress}
-              accuracy={accuracy}
-              setAccuracy={setAccuracy}
-            />
-          }
-        />
         <Route
           path="/learn"
           element={
@@ -75,6 +66,47 @@ function App() {
               nickname={nickname}
               wrongAnswersMap={wrongAnswersMap}
             />
+          }
+        />
+        <Route
+          path="/quiz/synonym"
+          element={
+            <SynonymQuizPage
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+            />
+          }
+        />
+        <Route
+          path="/quiz/combo"
+          element={
+            <HanjaComboPage
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+            />
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <HomeWithDailyQuiz
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              showLoginModal={showLoginModal}
+              setShowLoginModal={setShowLoginModal}
+              nickname={nickname}
+              setNickname={setNickname}
+              progress={progress}
+              setProgress={setProgress}
+              accuracy={accuracy}
+              setAccuracy={setAccuracy}
+            />
+          }
+        />
+        <Route
+          path="/ranking"
+          element={
+            <RankingPage isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
           }
         />
       </Routes>
