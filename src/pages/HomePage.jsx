@@ -13,6 +13,7 @@ const HomePage = ({
   setProgress,
   accuracy,
   setAccuracy,
+  setShowDailyResultModal, // 추가된 prop
 }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
@@ -45,12 +46,21 @@ const HomePage = ({
     setAccuracy(30);
   };
 
+  const handleCardClick = (item) => {
+    if (item.link === "/daily") {
+      setShowDailyResultModal(true); // 모달 열기
+    } else {
+      navigate(item.link); // 기본 라우팅
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f2f2] flex flex-col justify-between relative overflow-x-hidden">
       <Header
         isLoggedIn={isLoggedIn}
         setIsLoggedIn={setIsLoggedIn}
         setShowLoginModal={setShowLoginModal}
+        setShowDailyResultModal={setShowDailyResultModal}
       />
 
       {/* 카드 영역 */}
@@ -59,13 +69,13 @@ const HomePage = ({
           {menuItems.map((item, index) => (
             <div
               key={index}
-              onClick={() => navigate(item.link)}
+              onClick={() => handleCardClick(item)}
               className={`w-48 h-52 ${item.color} rounded-xl shadow-md flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform`}
             >
               <div className="text-lg font-bold">{item.title}</div>
               <div className="relative mt-4 w-24 h-14">
                 <div className="absolute top-1 left-2 w-20 h-10 bg-white rounded-md shadow opacity-50" />
-                <div className="absolute top-3 left-0 w-24 h-12 bg-white rounded-md shadow" />
+                <div className="absolute top-3 left-0 w-20 h-10 bg-white rounded-md shadow" />
               </div>
             </div>
           ))}

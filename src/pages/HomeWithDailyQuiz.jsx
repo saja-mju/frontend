@@ -3,6 +3,7 @@ import DailyQuizModal from "../components/DailyQuizModal";
 import CalendarModal from "../components/CalendarModal";
 import HomePage from "./HomePage";
 
+
 const HomeWithDailyQuiz = ({
   isLoggedIn,
   setIsLoggedIn,
@@ -14,19 +15,20 @@ const HomeWithDailyQuiz = ({
   setProgress,
   accuracy,
   setAccuracy,
+  quizHistory,
+  setQuizHistory
 }) => {
   const [showDailyQuiz, setShowDailyQuiz] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [quizHistory, setQuizHistory] = useState({});
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      const today = new Date().toISOString().split("T")[0];
-      if (!quizHistory[today]) {
-        setShowDailyQuiz(true);
-      }
+useEffect(() => {
+  if (isLoggedIn) {
+    const today = new Date().toISOString().split("T")[0];
+    if (!quizHistory[today]) {
+      setShowDailyQuiz(true);
     }
-  }, [isLoggedIn]);
+  }
+}, [isLoggedIn, quizHistory]);
 
   const handleSubmitQuiz = (isCorrect) => {
     const today = new Date().toISOString().split("T")[0];
@@ -34,6 +36,7 @@ const HomeWithDailyQuiz = ({
     setShowDailyQuiz(false);
     setShowCalendar(true);
   };
+
 
   return (
     <>
@@ -48,6 +51,7 @@ const HomeWithDailyQuiz = ({
         setProgress={setProgress}
         accuracy={accuracy}
         setAccuracy={setAccuracy}
+        setShowDailyResultModal={setShowCalendar} // ✅ 추가
       />
 
       {showDailyQuiz && <DailyQuizModal onSubmit={handleSubmitQuiz} />}

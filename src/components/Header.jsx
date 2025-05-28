@@ -1,12 +1,12 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({ isLoggedIn, setIsLoggedIn, setShowLoginModal }) => {
+const Header = ({ isLoggedIn, setIsLoggedIn, setShowLoginModal, setShowDailyResultModal }) => {
   const navigate = useNavigate();
   const [hoverMenu, setHoverMenu] = useState(null);
-  const timeoutRef = useRef(null); // <- 중요: 마우스 빠질 때 시간차 주기 위해
+  const timeoutRef = useRef(null);
 
-  const menuItems = [
+  const fullMenuItems = [
     {
       label: "기본학습",
       subItems: [
@@ -23,33 +23,50 @@ const Header = ({ isLoggedIn, setIsLoggedIn, setShowLoginModal }) => {
       ],
     },
     {
-      label: "오답노트", path: "/wrong",
-      subItems: [],
+      label: "오답노트",
+      path: "/wrong",
+      subItems: null,
     },
     {
-      label: "랭킹", path: "/ranking",
-      subItems: [],
-    },
-    {
-      label: "오늘의 문제", path: "/daily",
-      subItems: [],
+      label: "랭킹",
+      path: "/ranking",
+      subItems: null,
     },
   ];
 
+  const guestMenuItems = [
+    {
+      label: "기본학습",
+      subItems: [
+        { label: "학습하기", path: "/learn" },
+      ],
+    },
+  ];
+
+  const menuItems = isLoggedIn ? fullMenuItems : guestMenuItems;
+
   const handleMouseEnter = (index) => {
-    clearTimeout(timeoutRef.current); // 기존 타이머 제거
+    clearTimeout(timeoutRef.current);
     setHoverMenu(index);
   };
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setHoverMenu(null);
-    }, 150); // 하위 메뉴 사라지는 지연시간 설정
+    }, 150);
   };
 
   return (
     <header className="flex justify-between items-center px-6 py-4 bg-white shadow-sm relative z-50">
-      <nav className="flex gap-6 text-sm relative">
+      <nav className="flex gap-6 text-sm relative items-center">
+        {/* 홈버튼 */}
+        <div
+          className="cursor-pointer font-semibold"
+          onClick={() => navigate("/")}
+        >
+          홈
+        </div>
+
         {menuItems.map((menu, index) => (
           <div
             key={index}
@@ -61,11 +78,20 @@ const Header = ({ isLoggedIn, setIsLoggedIn, setShowLoginModal }) => {
               className={`cursor-pointer px-1 py-0.5 ${
                 hoverMenu === index ? "bg-yellow-200" : ""
               }`}
+              onClick={() => {
+                if (!menu.subItems) {
+                  if (menu.label === "오늘의 문제") {
+                    setShowDailyResultModal(true);
+                  } else if (menu.path) {
+                    navigate(menu.path);
+                  }
+                }
+              }}
             >
               {menu.label}
             </div>
 
-            {hoverMenu === index && menu.subItems.length > 0 && (
+            {hoverMenu === index && Array.isArray(menu.subItems) && menu.subItems.length > 0 && (
               <div className="absolute top-full left-0 mt-2 bg-white border rounded shadow-md w-max z-50">
                 {menu.subItems.map((subItem, subIndex) => (
                   <div
