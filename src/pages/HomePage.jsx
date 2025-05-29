@@ -35,16 +35,51 @@ const HomePage = ({
 
   const menuItems = isLoggedIn ? loggedInItems : guestItems;
 
-  const handleLogin = () => {
-    if (nickname.trim() === "") {
-      alert("닉네임을 입력해주세요.");
+const handleLogin = async () => {
+  if (nickname.trim() === "" || password.trim() === "") {
+    alert("닉네임과 비밀번호를 입력해주세요.");
+    return;
+  }
+
+  try {
+    // 1단계: 로그인 요청
+    const loginResponse = await fetch("http://localhost:3000/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include", // 세션 쿠키 주고받기
+      body: JSON.stringify({
+        username: nickname,
+        password: password
+      })
+    });
+
+    const loginData = await loginResponse.json();
+
+    if (!loginResponse.ok || !loginData.success) {
+      alert(loginData.message || "로그인에 실패했습니다.");
       return;
     }
+
+    // 2단계: 로그인 성공 후, 학습률/정확도 요청
+    const statsResponse = await fetch(`http://localhost:3000/results/stats/${nickname}`, {
+      method: "GET",
+      credentials: "include"
+    });
+
+    const statsData = await statsResponse.json();
+
     setIsLoggedIn(true);
     setShowLoginModal(false);
-    setProgress(80);
-    setAccuracy(30);
-  };
+    setProgress(statsData.progress || 0);
+    setAccuracy(statsData.accuracy || 0);
+  } catch (err) {
+    console.error("로그인 오류:", err);
+    alert("서버와의 연결 중 오류가 발생했습니다.");
+  }
+};
+
 
   const handleCardClick = (item) => {
     if (item.link === "/daily") {
