@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import SignUpModal from "../components/SignUpModal";
 
 const HomePage = ({
   isLoggedIn,
@@ -13,10 +14,11 @@ const HomePage = ({
   setProgress,
   accuracy,
   setAccuracy,
-  setShowDailyResultModal, // 추가된 prop
+  setShowDailyResultModal,
 }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
 
   const guestItems = [
     { title: "학습하기", color: "bg-red-400", link: "/learn" },
@@ -35,57 +37,45 @@ const HomePage = ({
 
   const menuItems = isLoggedIn ? loggedInItems : guestItems;
 
-const handleLogin = async () => {
-  if (nickname.trim() === "" || password.trim() === "") {
-    alert("닉네임과 비밀번호를 입력해주세요.");
-    return;
-  }
-
-  try {
-    // 1단계: 로그인 요청
-    const loginResponse = await fetch("http://localhost:3000/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include", // 세션 쿠키 주고받기
-      body: JSON.stringify({
-        username: nickname,
-        password: password
-      })
-    });
-
-    const loginData = await loginResponse.json();
-
-    if (!loginResponse.ok || !loginData.success) {
-      alert(loginData.message || "로그인에 실패했습니다.");
+  const handleLogin = async () => {
+    if (nickname.trim() === "" || password.trim() === "") {
+      alert("닉네임과 비밀번호를 입력해주세요.");
       return;
     }
 
-    // 2단계: 로그인 성공 후, 학습률/정확도 요청
-    const statsResponse = await fetch(`http://localhost:3000/results/stats/${nickname}`, {
-      method: "GET",
-      credentials: "include"
-    });
+    try {
+      const res = await fetch("http://localhost:3000/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: nickname,
+          password: password,
+        }),
+      });
 
-    const statsData = await statsResponse.json();
+      const data = await res.json();
 
-    setIsLoggedIn(true);
-    setShowLoginModal(false);
-    setProgress(statsData.progress || 0);
-    setAccuracy(statsData.accuracy || 0);
-  } catch (err) {
-    console.error("로그인 오류:", err);
-    alert("서버와의 연결 중 오류가 발생했습니다.");
-  }
-};
-
+      if (data.success) {
+        setIsLoggedIn(true);
+        setShowLoginModal(false);
+        alert("로그인 성공!");
+      } else {
+        alert(data.message || "로그인 실패");
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      alert("서버 오류");
+    }
+  };
 
   const handleCardClick = (item) => {
     if (item.link === "/daily") {
-      setShowDailyResultModal(true); // 모달 열기
+      setShowDailyResultModal(true);
     } else {
-      navigate(item.link); // 기본 라우팅
+      navigate(item.link);
     }
   };
 
@@ -98,9 +88,8 @@ const handleLogin = async () => {
         setShowDailyResultModal={setShowDailyResultModal}
       />
 
-      {/* 카드 영역 */}
       <div className="mt-10 w-full px-4 flex justify-center">
-        <div className={`grid ${isLoggedIn ? 'grid-cols-4' : 'grid-cols-3'} gap-4`}>
+        <div className={`grid ${isLoggedIn ? "grid-cols-4" : "grid-cols-3"} gap-4`}>
           {menuItems.map((item, index) => (
             <div
               key={index}
@@ -117,7 +106,6 @@ const handleLogin = async () => {
         </div>
       </div>
 
-      {/* 하단 반원 */}
       <div className="relative h-[180px] mt-10">
         <div className="absolute inset-x-0 bottom-0 w-full h-[180px] bg-white rounded-t-full flex flex-col items-center justify-center">
           {!isLoggedIn ? (
@@ -129,20 +117,14 @@ const handleLogin = async () => {
                 <span className="text-sm w-14 text-right">학습률</span>
                 <span className="text-sm w-8 text-left">{progress}%</span>
                 <div className="flex-1 bg-gray-300 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-blue-500 h-full"
-                    style={{ width: `${progress}%` }}
-                  />
+                  <div className="bg-blue-500 h-full" style={{ width: `${progress}%` }} />
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm w-14 text-right">정확도</span>
                 <span className="text-sm w-8 text-left">{accuracy}%</span>
                 <div className="flex-1 bg-gray-300 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-blue-400 h-full"
-                    style={{ width: `${accuracy}%` }}
-                  />
+                  <div className="bg-blue-400 h-full" style={{ width: `${accuracy}%` }} />
                 </div>
               </div>
             </div>
@@ -150,7 +132,6 @@ const handleLogin = async () => {
         </div>
       </div>
 
-      {/* 로그인 모달 */}
       {showLoginModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-80 rounded-lg shadow-lg p-6 relative z-50">
@@ -181,8 +162,24 @@ const handleLogin = async () => {
             >
               로그인
             </button>
+            <button
+              onClick={() => {
+                setShowLoginModal(false);
+                setShowSignUpModal(true);
+              }}
+              className="mt-2 w-full text-sm text-blue-500 hover:underline"
+            >
+              아직 계정이 없으신가요? 회원가입
+            </button>
           </div>
         </div>
+      )}
+
+      {showSignUpModal && (
+        <SignUpModal
+          setShowSignUpModal={setShowSignUpModal}
+          setShowLoginModal={setShowLoginModal}
+        />
       )}
     </div>
   );

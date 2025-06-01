@@ -1,5 +1,4 @@
-// src/pages/QuizPage.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
 const QuizPage = ({
@@ -9,21 +8,53 @@ const QuizPage = ({
   wrongAnswersMap,
   setWrongAnswersMap,
 }) => {
-  const data = [
-    {
-      description: "한자 네 자로 이루어진 성어.\n교훈이나 유래를 담고 있다.",
-      options: ["사자성어", "일석이조", "어부지리", "오매불망"],
-      answer: "사자성어",
-    },
-    {
-      description: "한 번의 노력으로 두 가지 이득을 얻음.",
-      options: ["군계일학", "일석이조", "오십보백보", "호시탐탐"],
-      answer: "일석이조",
-    },
-  ];
-
+  const [data, setData] = useState([]);
   const [index, setIndex] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // ✅ 정적 JSON 파일 불러오기
+  useEffect(() => {
+    fetch("http://localhost:3000/idioms")
+      .then((res) => res.json())
+      .then((json) => {
+        const quizData = generateQuiz(json, 10); // 원하는 문제 개수만큼
+        setData(quizData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("퀴즈 데이터 로딩 실패:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // ✅ 정답 + 오답 3개 보기로 구성된 퀴즈 문제 만들기
+  const generateQuiz = (allIdioms, count) => {
+    const shuffled = [...allIdioms].sort(() => Math.random() - 0.5);
+    const quizList = [];
+
+    for (let i = 0; i < Math.min(count, shuffled.length); i++) {
+      const correct = shuffled[i];
+      const otherOptions = allIdioms
+        .filter((item) => item.word !== correct.word)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+
+      const options = shuffle([correct.word, ...otherOptions.map((item) => item.word)]);
+
+      quizList.push({
+        description: correct.meaning,
+        options,
+        answer: correct.word,
+      });
+    }
+
+    return quizList;
+  };
+
+  // ✅ 보기 순서 섞기
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
   const current = data[index];
 
   const handleClick = (option) => {
@@ -31,8 +62,6 @@ const QuizPage = ({
       setFeedback("정답입니다!");
     } else {
       setFeedback("틀렸습니다!");
-
-      // ✅ 유저별로 오답 저장
       const existing = wrongAnswersMap[nickname] || [];
       const updatedMap = {
         ...wrongAnswersMap,
@@ -48,6 +77,9 @@ const QuizPage = ({
       }
     }, 800);
   };
+
+  if (loading) return <div className="text-center mt-10">로딩 중...</div>;
+  if (!current) return <div className="text-center mt-10">퀴즈가 없습니다.</div>;
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] flex flex-col">

@@ -1,16 +1,18 @@
-// src/pages/WordCardPage.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
 const WordCardPage = ({ isLoggedIn, setIsLoggedIn }) => {
-  const data = [
-    { hanja: "四字成語" },
-    { hanja: "一石二鳥" },
-    { hanja: "九死一生" },
-    { hanja: "千辛萬苦" },
-  ];
-
+  const [data, setData] = useState([]);
   const [index, setIndex] = useState(0);
+
+  // ✅ JSON에서 데이터 fetch
+  useEffect(() => {
+    fetch("http://localhost:3000/idioms")
+      .then((res) => res.json())
+      .then((json) => setData(json))
+      .catch((err) => console.error("사자성어 불러오기 실패:", err));
+  }, []);
+
   const current = data[index];
 
   const prev = () => {
@@ -20,6 +22,9 @@ const WordCardPage = ({ isLoggedIn, setIsLoggedIn }) => {
   const next = () => {
     if (index < data.length - 1) setIndex(index + 1);
   };
+
+  // 로딩 처리
+  if (!current) return <div className="text-center mt-10">로딩 중...</div>;
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] flex flex-col">
@@ -41,9 +46,10 @@ const WordCardPage = ({ isLoggedIn, setIsLoggedIn }) => {
             ◀
           </button>
 
+          {/* ✅ 한자 카드 */}
           <div className="border-4 border-orange-300 bg-white w-80 h-40 rounded-2xl shadow-md flex items-center justify-center">
             <span className="text-3xl font-extrabold text-black">
-              {current.hanja}
+              {current.word}
             </span>
           </div>
 

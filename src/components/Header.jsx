@@ -39,6 +39,8 @@ const Header = ({ isLoggedIn, setIsLoggedIn, setShowLoginModal, setShowDailyResu
       label: "기본학습",
       subItems: [
         { label: "학습하기", path: "/learn" },
+        { label: "낱말카드", path: "/cards" },
+        { label: "단어퀴즈", path: "/quiz" },
       ],
     },
   ];
